@@ -7,12 +7,15 @@ FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
 WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
-COPY ["AutorizacionesAprobadas.csproj", "."]
-RUN dotnet restore "./AutorizacionesAprobadas.csproj"
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "AutorizacionesAprobadas.csproj" -c Release -o /app/build
+WORKDIR /app/src/AutorizacionesAprobadas
+COPY src/AutorizacionesAprobadas/AutorizacionesAprobadas.csproj .
+RUN dotnet restore AutorizacionesAprobadas.csproj
+COPY src/Application ../Application
+COPY src/Domain ../Domain
+COPY src/InfraEstructure ../InfraEstructure
+COPY src/AutorizacionesAprobadas .
+WORKDIR /app/src/AutorizacionesAprobadas
+RUN dotnet build AutorizacionesAprobadas.csproj -c Release -o /app/build
 
 FROM build AS publish
 RUN dotnet publish "AutorizacionesAprobadas.csproj" -c Release -o /app/publish /p:UseAppHost=false
